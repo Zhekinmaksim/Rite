@@ -1,0 +1,9 @@
+node_modules
+.next
+.env
+.env.local
+.vercel
+data/workflows.json
+coverage
+.playwright-cli
+*.tsbuildinfo
