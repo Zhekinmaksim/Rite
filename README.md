@@ -31,11 +31,11 @@ The browser never receives `PRIVATE_KEY`. The server-side seal route signs `subm
 
 ## Vercel storage
 
-Vercel serverless functions cannot use `data/workflows.json` as durable storage. Install Upstash Redis from the Vercel Marketplace or set these variables before production deploy:
+Vercel serverless functions cannot use `data/workflows.json` as durable storage. Install Upstash KV from the Vercel Marketplace or set these variables before production deploy:
 
 ```bash
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
+KV_REST_API_URL=
+KV_REST_API_TOKEN=
 ```
 
 ## API

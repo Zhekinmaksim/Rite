@@ -7,3 +7,4 @@ data/workflows.json
 coverage
 .playwright-cli
 *.tsbuildinfo
+.env*.local
