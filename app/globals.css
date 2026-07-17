@@ -343,6 +343,13 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   text-transform: uppercase;
 }
 
+.secondary-button {
+  margin-left: 10px;
+  border-color: var(--rule);
+  background: transparent;
+  color: var(--ink);
+}
+
 .primary-button:hover,
 .button:hover {
   border-color: var(--rust);
@@ -391,6 +398,45 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 .onchain {
   border-color: var(--verified);
   color: var(--verified);
+}
+
+.onchain-text {
+  color: var(--verified);
+}
+
+.records-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.records-head .muted {
+  margin: 8px 0 0;
+}
+
+.filter-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill {
+  border: 1px solid var(--rule);
+  background: rgba(16, 21, 26, 0.8);
+  color: var(--ink-soft);
+  padding: 7px 10px;
+  cursor: pointer;
+  font-family: var(--font-data);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.pill:hover,
+.pill.active {
+  border-color: var(--rust);
+  color: var(--rust);
 }
 
 .mono {
@@ -469,6 +515,30 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   margin-top: 8px;
 }
 
+.commit-card {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  border: 1px solid var(--rule);
+  background: #0d1216;
+  padding: 14px;
+}
+
+.commit-card p {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 12px;
+  margin: 0;
+}
+
+.commit-card span:first-child {
+  color: var(--ink-soft);
+}
+
+.verify-result {
+  margin-top: 14px;
+}
+
 .label {
   display: block;
   margin: 20px 0 8px;
@@ -497,6 +567,7 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 
   .header-inner,
   .section-head,
+  .records-head,
   .workflow-row,
   .workflow-header,
   .step-head {
@@ -504,6 +575,7 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   }
 
   .header-inner,
+  .records-head,
   .workflow-header {
     flex-direction: column;
   }
@@ -530,6 +602,11 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   }
 
   .data-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .commit-card p {
     grid-template-columns: 1fr;
     gap: 2px;
   }

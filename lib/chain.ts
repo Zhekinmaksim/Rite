@@ -19,10 +19,14 @@ function configuredRpcUrl() {
   return process.env.RITUAL_RPC_URL ?? process.env.NEXT_PUBLIC_RITUAL_RPC_URL ?? 'https://rpc.ritualfoundation.org'
 }
 
+export function ritualPublicClient() {
+  return createPublicClient({ chain: ritual, transport: http(configuredRpcUrl()) })
+}
+
 export async function verifyStepOnchain(workflow: Workflow, step: TrailStep): Promise<boolean | null> {
   const address = configuredRiteAddress()
   if (!address) return null
-  const client = createPublicClient({ chain: ritual, transport: http(configuredRpcUrl()) })
+  const client = ritualPublicClient()
   return client.readContract({
     address,
     abi: riteAbi,

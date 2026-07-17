@@ -25,6 +25,16 @@ export type Workflow = {
   reportHash: Hex
   report: string
   steps: TrailStep[]
+  onchain?: OnchainCommit
+}
+
+export type OnchainCommit = {
+  txHash: Hex
+  committedBy: Hex
+  chainId: number
+  chainStatus: 'success' | 'reverted'
+  committedAt: number
+  blockNumber?: string
 }
 
 export type VerifyResult = {
@@ -32,5 +42,6 @@ export type VerifyResult = {
   index: number
   local: boolean
   onchain: 'verified' | 'unavailable' | 'failed'
+  tampered?: boolean
   reason?: string
 }

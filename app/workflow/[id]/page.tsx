@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import { addressExplorerUrl, txExplorerUrl } from '@/lib/explorer'
 import { workflowStore } from '@/lib/store'
 import { WorkflowActions } from '@/components/workflow-actions'
 
@@ -14,7 +15,9 @@ export default async function WorkflowPage({ params }: { params: Promise<{ id: s
         <h1>Audit record</h1>
         <p className="mono muted break-anywhere">{workflow.id}</p>
       </div>
-      <span className="stamp">local</span>
+      <span className={workflow.onchain?.chainStatus === 'success' ? 'stamp stamp-verified' : 'stamp'}>
+        {workflow.onchain?.chainStatus === 'success' ? 'sealed' : 'local'}
+      </span>
     </section>
 
     <section className="receipt mono">
@@ -23,6 +26,12 @@ export default async function WorkflowPage({ params }: { params: Promise<{ id: s
       <DataRow label="merkle root" value={workflow.merkleRoot} accent />
       <DataRow label="report hash" value={workflow.reportHash} />
       <DataRow label="created" value={new Date(workflow.createdAt).toISOString()} />
+      {workflow.onchain && <>
+        <DataRow label="chain status" value={workflow.onchain.chainStatus} accent={workflow.onchain.chainStatus === 'success'} />
+        <DataLink label="committed by" value={workflow.onchain.committedBy} href={addressExplorerUrl(workflow.onchain.committedBy)} />
+        <DataLink label="tx" value={workflow.onchain.txHash} href={txExplorerUrl(workflow.onchain.txHash)} accent />
+        {workflow.onchain.blockNumber && <DataRow label="block" value={workflow.onchain.blockNumber} />}
+      </>}
     </section>
 
     <section>
@@ -59,5 +68,12 @@ function DataRow({ label, value, accent }: { label: string; value: string; accen
   return <div className="data-row">
     <span>{label}</span>
     <span className={accent ? 'accent break-anywhere' : 'break-anywhere'}>{value}</span>
+  </div>
+}
+
+function DataLink({ label, value, href, accent }: { label: string; value: string; href: string; accent?: boolean }) {
+  return <div className="data-row">
+    <span>{label}</span>
+    <a className={accent ? 'accent link break-anywhere' : 'link break-anywhere'} href={href} target="_blank" rel="noreferrer">{value}</a>
   </div>
 }

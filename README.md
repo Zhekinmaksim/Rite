@@ -24,11 +24,15 @@ Deploy `Rite.sol` to Ritual, then set:
 NEXT_PUBLIC_CHAIN_ID=1979
 NEXT_PUBLIC_RITE_ADDRESS=0xYourRiteContract
 NEXT_PUBLIC_RITUAL_RPC_URL=https://rpc.ritualfoundation.org
+NEXT_PUBLIC_RITUAL_EXPLORER_URL=https://explorer.ritualfoundation.org
 RITUAL_RPC_URL=https://rpc.ritualfoundation.org
+RITUAL_EXPLORER_URL=https://explorer.ritualfoundation.org
 RITE_ADDRESS=0xYourRiteContract
 ```
 
 `submitWorkflow` is signed by the connected browser wallet. The production application does not operate a server signer.
+
+After a wallet commit, Rite records the transaction receipt in storage: signer, transaction hash, chain status, chain id and block number. Other visitors opening the workflow link can see the sealed state and follow the explorer links.
 
 ## Vercel storage
 

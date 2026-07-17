@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { txExplorerUrl } from '@/lib/explorer'
 import type { Workflow } from '@/lib/types'
 
 const placeholder = `pragma solidity ^0.7.0;
@@ -26,6 +27,8 @@ export default function Home() {
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [workflows, setWorkflows] = useState<Workflow[]>([])
+  const [wallet, setWallet] = useState<string | null>(null)
+  const [filter, setFilter] = useState<'all' | 'mine'>('all')
 
   useEffect(() => {
     fetch('/api/workflows')
@@ -56,6 +59,24 @@ export default function Home() {
       setRunning(false)
     }
   }
+
+  async function connectWallet() {
+    const ethereum = window.ethereum as { request: (args: { method: string; params?: unknown[] }) => Promise<unknown> } | undefined
+    if (!ethereum) {
+      setError('Connect an injected wallet to filter records by signer.')
+      return
+    }
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
+    const [account] = Array.isArray(accounts) ? accounts : []
+    setWallet(typeof account === 'string' ? account : null)
+    setFilter('mine')
+  }
+
+  const visibleWorkflows = useMemo(() => {
+    if (filter === 'all') return workflows
+    if (!wallet) return []
+    return workflows.filter(workflow => workflow.onchain?.committedBy.toLowerCase() === wallet.toLowerCase())
+  }, [filter, wallet, workflows])
 
   return <div className="page-stack">
     <section className="hero-grid">
@@ -118,20 +139,32 @@ export default function Home() {
     </section>
 
     <section>
-      <h2 className="section-title">Records</h2>
-      {workflows.length === 0 ? (
+      <div className="records-head">
+        <div>
+          <h2 className="section-title">Records</h2>
+          {wallet && <p className="mono muted">connected: {wallet}</p>}
+        </div>
+        <div className="filter-actions">
+          <button className={filter === 'all' ? 'pill active' : 'pill'} onClick={() => setFilter('all')}>All</button>
+          <button className={filter === 'mine' ? 'pill active' : 'pill'} onClick={wallet ? () => setFilter('mine') : connectWallet}>My records</button>
+        </div>
+      </div>
+      {visibleWorkflows.length === 0 ? (
         <p className="muted mono">No records yet. Generate the first audit record above.</p>
       ) : (
         <ul className="workflow-list">
-          {workflows.map(workflow => (
+          {visibleWorkflows.map(workflow => (
             <li key={workflow.id} className="workflow-row">
               <div className="min-zero">
                 <a href={`/workflow/${workflow.id}`} className="mono link break-anywhere">{workflow.id}</a>
                 <div className="mono subline">
                   {new Date(workflow.createdAt).toISOString()} · {workflow.steps.length} steps · root {workflow.merkleRoot.slice(0, 18)}...
                 </div>
+                {workflow.onchain && <div className="mono subline">
+                  committed by {workflow.onchain.committedBy.slice(0, 10)}... · <a className="link" href={txExplorerUrl(workflow.onchain.txHash)} target="_blank" rel="noreferrer">tx</a>
+                </div>}
               </div>
-              <span className="stamp">local</span>
+              <span className={workflow.onchain?.chainStatus === 'success' ? 'stamp stamp-verified' : 'stamp'}>{workflow.onchain?.chainStatus === 'success' ? 'sealed' : 'local'}</span>
             </li>
           ))}
         </ul>

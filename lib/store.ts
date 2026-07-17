@@ -1,6 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import type { Workflow } from '@/lib/types'
+import type { OnchainCommit, Workflow } from '@/lib/types'
 
 const defaultPath = path.join(process.cwd(), 'data', 'workflows.json')
 const storePath = process.env.WORKFLOW_STORE_PATH ? path.resolve(process.env.WORKFLOW_STORE_PATH) : defaultPath
@@ -79,5 +79,24 @@ export const workflowStore = {
     workflows.push(workflow)
     await writeAll(workflows)
     return workflow
+  },
+  async recordCommit(id: string, onchain: OnchainCommit) {
+    const redisClient = await getRedis()
+    if (redisClient) {
+      const workflow = await redisClient.get<Workflow>(workflowKey(id))
+      if (!workflow) return null
+      const updated: Workflow = { ...workflow, onchain }
+      await redisClient.set(workflowKey(workflow.id), updated)
+      await redisClient.zadd(indexKey, { score: updated.createdAt, member: updated.id.toLowerCase() })
+      return updated
+    }
+    if (isVercelRuntime()) throw missingProductionStoreError()
+    const workflows = await readAll()
+    const index = workflows.findIndex(workflow => workflow.id.toLowerCase() === id.toLowerCase())
+    if (index === -1) return null
+    const updated: Workflow = { ...workflows[index], onchain }
+    workflows[index] = updated
+    await writeAll(workflows)
+    return updated
   }
 }
