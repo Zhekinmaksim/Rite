@@ -65,9 +65,33 @@ export default function Home() {
         <p>Rite turns a contract review into a deterministic evidence trail: researcher, critic, finalizer. Each step commits to its input, output and predecessor. The resulting Merkle root is signed by the user wallet and anchored on Ritual Chain.</p>
       </div>
       <div className="protocol-card" aria-label="Rite protocol summary">
-        <span>task hash</span>
-        <strong>researcher → critic → finalizer</strong>
-        <span>step hashes → Merkle root → wallet commit</span>
+        <div className="protocol-card-head">
+          <span>Commit path</span>
+          <em>step.v1</em>
+        </div>
+        <ol className="protocol-steps">
+          <li>
+            <span>01</span>
+            <div>
+              <strong>Input</strong>
+              <p>source → task hash</p>
+            </div>
+          </li>
+          <li>
+            <span>02</span>
+            <div>
+              <strong>Trail</strong>
+              <p>ordered step hashes</p>
+            </div>
+          </li>
+          <li>
+            <span>03</span>
+            <div>
+              <strong>Commit</strong>
+              <p>Merkle root → wallet</p>
+            </div>
+          </li>
+        </ol>
       </div>
     </section>
 
