@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createPublicClient, createWalletClient, custom, defineChain, http, isAddress } from 'viem'
+import { createPublicClient, createWalletClient, custom, defineChain, encodeFunctionData, http, isAddress, numberToHex } from 'viem'
 import { addressExplorerUrl, txExplorerUrl } from '@/lib/explorer'
 import { hashText } from '@/lib/hashing'
 import { riteAbi } from '@/lib/rite-abi'
@@ -59,16 +59,18 @@ export function WorkflowActions({ workflow }: { workflow: Workflow }) {
           args,
         })
       ])
-      const txHash = await walletClient.writeContract({
-        account,
-        address,
-        abi: riteAbi,
-        functionName: 'submitWorkflow',
-        args,
-        gas,
-        gasPrice,
-        type: 'legacy',
-      })
+      const calldata = encodeFunctionData({ abi: riteAbi, functionName: 'submitWorkflow', args })
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          from: account,
+          to: address,
+          data: calldata,
+          gas: numberToHex((gas * 12n) / 10n),
+          gasPrice: numberToHex(gasPrice),
+          value: '0x0',
+        }],
+      }) as `0x${string}`
       const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
       setMessage(`Committed: ${txHash} (${receipt.status}). Recording receipt...`)
       const response = await fetch(`/api/workflows/${workflow.id}/commit`, {
@@ -76,9 +78,9 @@ export function WorkflowActions({ workflow }: { workflow: Workflow }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ txHash, committedBy: account }),
       })
-      const data = await response.json() as { workflow?: Workflow; error?: string }
-      if (!response.ok || !data.workflow?.onchain) throw new Error(data.error ?? 'Commit confirmed, but storage update failed.')
-      setCommit(data.workflow.onchain)
+      const payload = await response.json() as { workflow?: Workflow; error?: string }
+      if (!response.ok || !payload.workflow?.onchain) throw new Error(payload.error ?? 'Commit confirmed, but storage update failed.')
+      setCommit(payload.workflow.onchain)
       setMessage('Commit recorded.')
       router.refresh()
     } catch (caught) {
