@@ -10,5 +10,24 @@ export default async function VerifyStepPage({ params, searchParams }: { params:
   const index = Number(query.index ?? '0')
   if (!workflow || !Number.isInteger(index) || !workflow.steps[index]) notFound()
   const step = workflow.steps[index]
-  return <main><nav className="nav"><a className="brand" href={`/workflow/${id}`}><i>←</i> RITE</a><span className="status local">verification</span></nav><section className="hero"><span className="eyebrow">proof check</span><h1>Verify the<br />witness.</h1><p>Recompute the sorted-pair Merkle path locally, then ask the deployed Rite contract for the same answer when it is configured.</p></section><section className="grid"><div className="panel"><h2>Step {index + 1}: {step.role}</h2><p className="mono">{step.hash}</p><VerifyStep workflowId={workflow.id} index={index} /></div><aside className="panel"><h2>Proof path</h2>{step.proof.map((hash, position) => <p key={hash} className="mono muted">{position + 1}. {hash}</p>)}<p className="label">Expected root</p><p className="mono">{workflow.merkleRoot}</p></aside></section></main>
+  return <div className="page-stack">
+    <section className="hero compact">
+      <h1>Verify step</h1>
+      <p className="mono break-anywhere">workflow {workflow.id}</p>
+    </section>
+    <section className="two-column">
+      <div className="receipt">
+        <h2>Step {index + 1}: {step.role}</h2>
+        <p className="mono accent break-anywhere">{step.hash}</p>
+        <VerifyStep workflowId={workflow.id} index={index} />
+      </div>
+      <aside className="receipt">
+        <h2>Proof path</h2>
+        {step.proof.length === 0 ? <p className="mono muted">(single leaf)</p> : step.proof.map((hash, position) => <p key={hash} className="mono muted break-anywhere">{position + 1}. {hash}</p>)}
+        <p className="label">Expected root</p>
+        <p className="mono break-anywhere">{workflow.merkleRoot}</p>
+      </aside>
+    </section>
+    <a href={`/workflow/${workflow.id}`} className="mono link">Back to workflow</a>
+  </div>
 }

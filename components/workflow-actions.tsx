@@ -18,5 +18,5 @@ export function WorkflowActions({ workflow }: { workflow: Workflow }) {
     }
   }
 
-  return <div><button className="button" onClick={seal}>Seal on Ritual</button>{message && <p className="mono muted">{message}</p>}</div>
+  return <div className="action-block"><button className="primary-button" onClick={seal}>Seal on Ritual</button>{message && <p className="mono muted break-anywhere">{message}</p>}</div>
 }

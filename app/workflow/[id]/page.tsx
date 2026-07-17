@@ -8,9 +8,56 @@ export default async function WorkflowPage({ params }: { params: Promise<{ id: s
   const { id } = await params
   const workflow = await workflowStore.get(id)
   if (!workflow) notFound()
-  return <main>
-    <nav className="nav"><a className="brand" href="/"><i>R</i>ITE</a><span className="status local">local receipt</span></nav>
-    <section className="workflow-header"><div><span className="eyebrow">workflow receipt</span><h1>{workflow.target}</h1><p className="mono muted">{workflow.id}</p></div><WorkflowActions workflow={workflow} /></section>
-    <section className="grid"><div className="panel"><h2>Performed trail</h2><div className="steps">{workflow.steps.map(step => <article className="step" key={step.hash}><div className="step-head"><h3>0{step.index + 1} / {step.role}</h3><span className="status local">witnessed</span></div><p className="muted">{step.output}</p><ul className="findings">{step.findings.map(finding => <li key={finding}>{finding}</li>)}</ul><div className="mono muted">leaf {step.hash}</div><div className="actions"><a className="button" href={`/workflow/${workflow.id}/verify-step?index=${step.index}`}>Verify step</a></div></article>)}</div></div><aside className="panel"><h2>Seal payload</h2><p className="label">Merkle root</p><p className="mono">{workflow.merkleRoot}</p><p className="label">Report hash</p><p className="mono">{workflow.reportHash}</p><p className="label">Policy hash</p><p className="mono">{workflow.policyHash}</p><p className="muted">The server signs this seal with PRIVATE_KEY and writes the four bound values to Rite. The proof remains independently verifiable.</p></aside></section>
-  </main>
+  return <div className="page-stack">
+    <section className="workflow-header">
+      <div className="min-zero">
+        <h1>Rite record</h1>
+        <p className="mono muted break-anywhere">{workflow.id}</p>
+      </div>
+      <span className="stamp">local</span>
+    </section>
+
+    <section className="receipt mono">
+      <DataRow label="target" value={workflow.target} />
+      <DataRow label="policy hash" value={workflow.policyHash} />
+      <DataRow label="merkle root" value={workflow.merkleRoot} accent />
+      <DataRow label="report hash" value={workflow.reportHash} />
+      <DataRow label="created" value={new Date(workflow.createdAt).toISOString()} />
+    </section>
+
+    <section>
+      <h2 className="section-title">Agent trail · {workflow.steps.length} steps</h2>
+      <ol className="step-list">
+        {workflow.steps.map(step => (
+          <li key={step.hash} className="receipt step-card">
+            <div className="step-head">
+              <span>{step.index + 1}. {step.role}</span>
+              <span className="stamp">witnessed</span>
+            </div>
+            <pre className="step-output">{step.output}</pre>
+            {step.findings.length > 0 && <ul className="findings">{step.findings.map(finding => <li key={finding}>{finding}</li>)}</ul>}
+            <div className="mono data-block">
+              <DataRow label="input hash" value={step.inputHash} />
+              <DataRow label="output hash" value={step.outputHash} />
+              <DataRow label="step hash" value={step.hash} accent />
+            </div>
+            <a href={`/workflow/${workflow.id}/verify-step?index=${step.index}`} className="mono link">Verify this step against the root</a>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section className="receipt">
+      <h2>Anchor onchain</h2>
+      <p className="muted">Commits workflowId, Merkle root, report hash and policy hash to Rite on Ritual Chain. After this, any step can be proven against the onchain root.</p>
+      <WorkflowActions workflow={workflow} />
+    </section>
+  </div>
+}
+
+function DataRow({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return <div className="data-row">
+    <span>{label}</span>
+    <span className={accent ? 'accent break-anywhere' : 'break-anywhere'}>{value}</span>
+  </div>
 }
