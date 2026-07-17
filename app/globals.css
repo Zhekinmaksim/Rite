@@ -60,11 +60,20 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: var(--ink);
   font-size: 22px;
   font-weight: 420;
   letter-spacing: 0.08em;
   text-decoration: none;
+}
+
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  display: block;
 }
 
 .top-links,

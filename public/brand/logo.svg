@@ -1,0 +1,16 @@
+<svg width="1400" height="360" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="360" fill="#0b0e11"/>
+  <g transform="translate(64,52) scale(0.5)">
+    <path d="M 269.9 96.6 A 160 160 0 0 1 413.6 283.8" fill="none" stroke="#8a939e" stroke-width="34"/>
+    <path d="M 406.4 310.7 A 160 160 0 0 1 188.4 401.0" fill="none" stroke="#8a939e" stroke-width="34"/>
+    <path d="M 164.2 387.1 A 160 160 0 0 1 133.4 153.2" fill="none" stroke="#8a939e" stroke-width="34"/>
+    <path d="M 153.2 133.4 A 160 160 0 0 1 250.4 96.1" fill="none" stroke="#ff5c33" stroke-width="34"/>
+    <line x1="256" y1="196" x2="256" y2="236" stroke="#3a444e" stroke-width="8"/>
+    <line x1="256" y1="276" x2="256" y2="316" stroke="#3a444e" stroke-width="8"/>
+    <line x1="196" y1="256" x2="236" y2="256" stroke="#3a444e" stroke-width="8"/>
+    <line x1="276" y1="256" x2="316" y2="256" stroke="#3a444e" stroke-width="8"/>
+    <rect x="244" y="244" width="24" height="24" fill="#ff5c33"/>
+  </g>
+  <text x="380" y="204" font-family="DejaVu Sans Mono" font-size="132" letter-spacing="46" fill="#e8ebee">RITE</text>
+  <text x="386" y="266" font-family="DejaVu Sans Mono" font-size="30" letter-spacing="9" fill="#8a939e">VERIFIABLE RITES OF AGENT WORK</text>
+</svg>
