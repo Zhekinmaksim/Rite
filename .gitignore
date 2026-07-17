@@ -8,3 +8,5 @@ coverage
 .playwright-cli
 *.tsbuildinfo
 .env*.local
+target
+zk/**/target

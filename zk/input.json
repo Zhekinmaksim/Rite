@@ -1,0 +1,29 @@
+{
+  "workflow_id": "0x1111111111111111111111111111111111111111111111111111111111111111",
+  "task": "RiteStressVault\nReview a vault with authorization, external calls and upgrade surface.\npragma solidity ^0.8.24;\n\ncontract RiteStressVault {\n    address public owner;\n    address public implementation;\n    mapping(address => uint256) public balances;\n\n    constructor() {\n        owner = msg.sender;\n    }\n\n    function withdraw() external {\n        require(tx.origin == owner, \"owner only\");\n        uint256 amount = balances[msg.sender];\n        (bool ok, ) = msg.sender.call{value: amount}(\"\");\n        require(ok, \"transfer failed\");\n        balances[msg.sender] = 0;\n    }\n\n    function upgrade(bytes calldata data) external {\n        require(tx.origin == owner, \"owner only\");\n        (bool ok, ) = implementation.delegatecall(data);\n        require(ok, \"delegatecall failed\");\n    }\n\n    function sweep(address payable to) external {\n        require(tx.origin == owner, \"owner only\");\n        to.transfer(address(this).balance);\n    }\n}",
+  "policy": "rite.policy.v1:researcher>critic>finalizer",
+  "final_report": "Final assessment: 4 machine-detected signal(s). This trail is an evidence receipt, not a substitute for a human security audit.",
+  "steps": [
+    {
+      "role": "researcher",
+      "input_hash": "0x409649b7658e035aef6f6896e2148d5b5289af8ebab51fdb572a1add4e6abf53",
+      "output_hash": "0x97a95f1858a6fc46bc2a8db18d0f12267f732eb077504de27d134dd7601c866f",
+      "policy_hash": "0x533c6a5c6841365f37218788ce26c71acf974c0f928ccca07ec9a6cfb80f51a9",
+      "timestamp": 1720000000001
+    },
+    {
+      "role": "critic",
+      "input_hash": "0x97a95f1858a6fc46bc2a8db18d0f12267f732eb077504de27d134dd7601c866f",
+      "output_hash": "0x8d1deaeb7e454c64d5bd4f17c970ea0daa4d33ddf6a79a3f4d6737e02cc496c5",
+      "policy_hash": "0x533c6a5c6841365f37218788ce26c71acf974c0f928ccca07ec9a6cfb80f51a9",
+      "timestamp": 1720000000002
+    },
+    {
+      "role": "finalizer",
+      "input_hash": "0x8d1deaeb7e454c64d5bd4f17c970ea0daa4d33ddf6a79a3f4d6737e02cc496c5",
+      "output_hash": "0xbcdb4e8aa601ae5ef05b91eddce874f274fe9043e20b65b93287005ecf7189c0",
+      "policy_hash": "0x533c6a5c6841365f37218788ce26c71acf974c0f928ccca07ec9a6cfb80f51a9",
+      "timestamp": 1720000000003
+    }
+  ]
+}
