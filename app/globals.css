@@ -67,10 +67,33 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   text-decoration: none;
 }
 
+.top-links,
 .chain,
 .footer-copy,
 .mono {
   font-family: var(--font-data);
+}
+
+.top-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 14px;
+  color: var(--ink-soft);
+  font-size: 12px;
+}
+
+.top-links a,
+.footer-links a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.top-links a:hover,
+.footer-links a:hover {
+  color: var(--rust);
 }
 
 .chain,
@@ -80,7 +103,17 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 }
 
 .footer-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
   padding: 24px 0;
+}
+
+.footer-links {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 14px;
 }
 
 .page-shell {
@@ -360,6 +393,15 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 
   .header-inner,
   .workflow-header {
+    flex-direction: column;
+  }
+
+  .top-links {
+    justify-content: flex-start;
+  }
+
+  .footer-copy {
+    align-items: flex-start;
     flex-direction: column;
   }
 

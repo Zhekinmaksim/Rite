@@ -5,9 +5,11 @@ export const riteAbi = [
     stateMutability: 'nonpayable',
     inputs: [
       { name: 'workflowId', type: 'bytes32' },
+      { name: 'taskHash', type: 'bytes32' },
       { name: 'merkleRoot', type: 'bytes32' },
       { name: 'reportHash', type: 'bytes32' },
-      { name: 'policyHash', type: 'bytes32' }
+      { name: 'policyHash', type: 'bytes32' },
+      { name: 'metadataURI', type: 'string' }
     ],
     outputs: []
   },

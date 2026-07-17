@@ -1,6 +1,7 @@
 import { createPublicClient, createWalletClient, http, isAddress } from 'viem'
 import { defineChain } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
+import { hashText } from '@/lib/hashing'
 import { riteAbi } from '@/lib/rite-abi'
 import type { Hex, TrailStep, Workflow } from '@/lib/types'
 
@@ -51,7 +52,7 @@ export async function submitWorkflowOnchain(workflow: Workflow) {
     address,
     abi: riteAbi,
     functionName: 'submitWorkflow',
-    args: [workflow.id, workflow.merkleRoot, workflow.reportHash, workflow.policyHash]
+    args: [workflow.id, hashText(workflow.source), workflow.merkleRoot, workflow.reportHash, workflow.policyHash, '']
   })
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
   return { txHash, blockNumber: receipt.blockNumber.toString(), status: receipt.status }
