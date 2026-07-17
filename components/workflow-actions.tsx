@@ -42,19 +42,33 @@ export function WorkflowActions({ workflow }: { workflow: Workflow }) {
     try {
       setMessage('Waiting for wallet signature...')
       const walletClient = createWalletClient({ chain: ritual, transport: custom(window.ethereum) })
+      const publicClient = createPublicClient({ chain: ritual, transport: http(process.env.NEXT_PUBLIC_RITUAL_RPC_URL ?? 'https://rpc.ritualfoundation.org') })
       const [account] = await walletClient.requestAddresses()
       const activeChain = await walletClient.getChainId()
       if (activeChain !== ritual.id) {
         await walletClient.switchChain({ id: ritual.id })
       }
+      const args = [workflow.id, hashText(workflow.source), workflow.merkleRoot, workflow.reportHash, workflow.policyHash, ''] as const
+      const [gasPrice, gas] = await Promise.all([
+        publicClient.getGasPrice(),
+        publicClient.estimateContractGas({
+          account,
+          address,
+          abi: riteAbi,
+          functionName: 'submitWorkflow',
+          args,
+        })
+      ])
       const txHash = await walletClient.writeContract({
         account,
         address,
         abi: riteAbi,
         functionName: 'submitWorkflow',
-        args: [workflow.id, hashText(workflow.source), workflow.merkleRoot, workflow.reportHash, workflow.policyHash, ''],
+        args,
+        gas,
+        gasPrice,
+        type: 'legacy',
       })
-      const publicClient = createPublicClient({ chain: ritual, transport: http() })
       const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
       setMessage(`Committed: ${txHash} (${receipt.status}). Recording receipt...`)
       const response = await fetch(`/api/workflows/${workflow.id}/commit`, {
