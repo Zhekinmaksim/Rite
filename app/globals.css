@@ -591,6 +591,16 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
   margin-top: 8px;
 }
 
+.next-audit {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.next-audit .primary-button {
+  margin-top: 0;
+  text-decoration: none;
+}
+
 .commit-card {
   display: grid;
   gap: 8px;

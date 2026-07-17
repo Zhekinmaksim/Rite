@@ -91,6 +91,10 @@ export default async function WorkflowPage({ params }: { params: Promise<{ id: s
       <p className="muted">Signs submitWorkflow from the connected wallet and commits workflowId, task hash, Merkle root, report hash and policy hash to Rite on Ritual Chain. No server signer is used.</p>
       <WorkflowActions workflow={workflow} />
     </section>
+
+    <section className="next-audit">
+      <a href="/" className="primary-button">New audit →</a>
+    </section>
   </div>
 }
 
