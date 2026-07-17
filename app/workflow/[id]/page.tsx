@@ -9,15 +9,45 @@ export default async function WorkflowPage({ params }: { params: Promise<{ id: s
   const { id } = await params
   const workflow = await workflowStore.get(id)
   if (!workflow) notFound()
+  const findings = Array.from(new Set(workflow.steps.flatMap(step => step.findings)))
+  const finalizer = workflow.steps.find(step => step.role === 'finalizer') ?? workflow.steps.at(-1)
+  const sealed = workflow.onchain?.chainStatus === 'success'
   return <div className="page-stack">
     <section className="workflow-header">
       <div className="min-zero">
         <h1>Audit record</h1>
         <p className="mono muted break-anywhere">{workflow.id}</p>
       </div>
-      <span className={workflow.onchain?.chainStatus === 'success' ? 'stamp stamp-verified' : 'stamp'}>
-        {workflow.onchain?.chainStatus === 'success' ? 'sealed' : 'local'}
+      <span className={sealed ? 'stamp stamp-verified' : 'stamp'}>
+        {sealed ? 'sealed' : 'local'}
       </span>
+    </section>
+
+    <section className={sealed ? 'receipt result-card result-card-sealed' : 'receipt result-card'}>
+      <div className="result-head">
+        <div>
+          <p className="eyebrow">Result</p>
+          <h2>{findings.length > 0 ? 'Review required' : 'No machine signals detected'}</h2>
+        </div>
+        <span className={sealed ? 'stamp stamp-verified' : 'stamp'}>{sealed ? 'sealed on Ritual' : 'not signed yet'}</span>
+      </div>
+      <p className="result-summary">{finalizer?.output ?? workflow.report}</p>
+      <div className="result-metrics mono">
+        <div><span>risk signals</span><strong>{findings.length}</strong></div>
+        <div><span>steps</span><strong>{workflow.steps.length}</strong></div>
+        <div><span>commit</span><strong className={sealed ? 'onchain-text' : 'accent'}>{sealed ? 'onchain' : 'local'}</strong></div>
+      </div>
+      {findings.length > 0 && <div>
+        <p className="label">Main issues</p>
+        <ul className="result-findings">
+          {findings.map(finding => <li key={finding}>{finding}</li>)}
+        </ul>
+      </div>}
+      <div className="mono data-block">
+        <DataRow label="report hash" value={workflow.reportHash} />
+        <DataRow label="merkle root" value={workflow.merkleRoot} accent />
+        {workflow.onchain && <DataLink label="tx" value={workflow.onchain.txHash} href={txExplorerUrl(workflow.onchain.txHash)} accent />}
+      </div>
     </section>
 
     <section className="receipt mono">
