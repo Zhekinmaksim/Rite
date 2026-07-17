@@ -195,6 +195,9 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 }
 
 .schematic-panel {
+  width: min(1480px, calc(100vw - 48px));
+  margin-left: 50%;
+  transform: translateX(-50%);
   border: 1px solid var(--rule);
   background: #080b0e;
   padding: 10px;
@@ -459,6 +462,10 @@ h1, h2, h3, p { overflow-wrap: anywhere; }
 
   .hero-grid {
     grid-template-columns: 1fr;
+  }
+
+  .schematic-panel {
+    width: calc(100vw - 32px);
   }
 
   .footer-copy {
