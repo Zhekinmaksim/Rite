@@ -1,20 +1,26 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { Redis } from '@upstash/redis'
 import type { Workflow } from '@/lib/types'
 
 const defaultPath = path.join(process.cwd(), 'data', 'workflows.json')
 const storePath = process.env.WORKFLOW_STORE_PATH ? path.resolve(process.env.WORKFLOW_STORE_PATH) : defaultPath
-const indexKey = 'rite:workflows'
-const workflowKey = (id: string) => `rite:workflow:${id.toLowerCase()}`
+const indexKey = 'rite:wf:index'
+const workflowKey = (id: string) => `rite:wf:${id.toLowerCase()}`
 
-let redis: Redis | null | undefined
+type RedisClient = import('@upstash/redis').Redis
 
-function getRedis() {
+let redis: RedisClient | null | undefined
+
+async function getRedis() {
   if (redis !== undefined) return redis
   const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL
   const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN
-  redis = url && token ? new Redis({ url, token }) : null
+  if (!url || !token) {
+    redis = null
+    return redis
+  }
+  const { Redis } = await import('@upstash/redis')
+  redis = new Redis({ url, token })
   return redis
 }
 
@@ -42,30 +48,30 @@ async function writeAll(workflows: Workflow[]) {
   await rename(tempPath, storePath)
 }
 
-async function listRedis(redisClient: Redis): Promise<Workflow[]> {
-  const ids = await redisClient.smembers<string[]>(indexKey)
+async function listRedis(redisClient: RedisClient): Promise<Workflow[]> {
+  const ids = await redisClient.zrange<string[]>(indexKey, 0, 99, { rev: true })
   const workflows = await Promise.all(ids.map(id => redisClient.get<Workflow>(workflowKey(id))))
   return workflows.filter((workflow): workflow is Workflow => Boolean(workflow))
 }
 
 export const workflowStore = {
   async list() {
-    const redisClient = getRedis()
-    if (redisClient) return (await listRedis(redisClient)).sort((a, b) => b.createdAt - a.createdAt)
+    const redisClient = await getRedis()
+    if (redisClient) return listRedis(redisClient)
     if (isVercelRuntime()) return []
     return (await readAll()).sort((a, b) => b.createdAt - a.createdAt)
   },
   async get(id: string) {
-    const redisClient = getRedis()
+    const redisClient = await getRedis()
     if (redisClient) return await redisClient.get<Workflow>(workflowKey(id))
     if (isVercelRuntime()) return null
     return (await readAll()).find(workflow => workflow.id.toLowerCase() === id.toLowerCase()) ?? null
   },
   async create(workflow: Workflow) {
-    const redisClient = getRedis()
+    const redisClient = await getRedis()
     if (redisClient) {
       await redisClient.set(workflowKey(workflow.id), workflow)
-      await redisClient.sadd(indexKey, workflow.id.toLowerCase())
+      await redisClient.zadd(indexKey, { score: workflow.createdAt, member: workflow.id.toLowerCase() })
       return workflow
     }
     if (isVercelRuntime()) throw missingProductionStoreError()
