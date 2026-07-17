@@ -25,35 +25,18 @@ export function WorkflowActions({ workflow }: { workflow: Workflow }) {
   const [message, setMessage] = useState('')
 
   async function seal() {
-    setMessage('Submitting seal...')
-    try {
-      const response = await fetch(`/api/workflows/${workflow.id}/seal`, { method: 'POST' })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error ?? 'Seal failed.')
-      setMessage(`Submitted: ${data.seal.txHash}`)
-    } catch (error) {
-      const serverMessage = error instanceof Error ? error.message : 'Seal failed.'
-      if (!serverMessage.includes('PRIVATE_KEY')) {
-        setMessage(serverMessage)
-        return
-      }
-      await sealWithWallet()
-    }
-  }
-
-  async function sealWithWallet() {
     const address = process.env.NEXT_PUBLIC_RITE_ADDRESS
     if (!address || !isAddress(address)) {
-      setMessage('Set NEXT_PUBLIC_RITE_ADDRESS before sealing.')
+      setMessage('Set NEXT_PUBLIC_RITE_ADDRESS before committing onchain.')
       return
     }
     if (!window.ethereum) {
-      setMessage('Server signer is not configured and no injected wallet was found.')
+      setMessage('Connect an injected wallet to commit this record onchain.')
       return
     }
 
     try {
-      setMessage('Server signer unavailable. Waiting for wallet...')
+      setMessage('Waiting for wallet signature...')
       const walletClient = createWalletClient({ chain: ritual, transport: custom(window.ethereum) })
       const [account] = await walletClient.requestAddresses()
       const activeChain = await walletClient.getChainId()
@@ -69,11 +52,11 @@ export function WorkflowActions({ workflow }: { workflow: Workflow }) {
       })
       const publicClient = createPublicClient({ chain: ritual, transport: http() })
       const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
-      setMessage(`Submitted: ${txHash} (${receipt.status})`)
+      setMessage(`Committed: ${txHash} (${receipt.status})`)
     } catch (caught) {
-      setMessage(caught instanceof Error ? caught.message : 'Wallet seal failed.')
+      setMessage(caught instanceof Error ? caught.message : 'Wallet commit failed.')
     }
   }
 
-  return <div className="action-block"><button className="primary-button" onClick={seal}>Seal on Ritual</button>{message && <p className="mono muted break-anywhere">{message}</p>}</div>
+  return <div className="action-block"><button className="primary-button" onClick={seal}>Commit with wallet</button>{message && <p className="mono muted break-anywhere">{message}</p>}</div>
 }

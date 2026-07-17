@@ -1,7 +1,5 @@
-import { createPublicClient, createWalletClient, http, isAddress } from 'viem'
+import { createPublicClient, http, isAddress } from 'viem'
 import { defineChain } from 'viem'
-import { privateKeyToAccount } from 'viem/accounts'
-import { hashText } from '@/lib/hashing'
 import { riteAbi } from '@/lib/rite-abi'
 import type { Hex, TrailStep, Workflow } from '@/lib/types'
 
@@ -21,15 +19,9 @@ function configuredRpcUrl() {
   return process.env.RITUAL_RPC_URL ?? process.env.NEXT_PUBLIC_RITUAL_RPC_URL ?? 'https://rpc.ritualfoundation.org'
 }
 
-function configuredPrivateKey(): Hex | null {
-  const key = process.env.PRIVATE_KEY?.trim()
-  if (!key) return null
-  return (key.startsWith('0x') ? key : `0x${key}`) as Hex
-}
-
 export async function verifyStepOnchain(workflow: Workflow, step: TrailStep): Promise<boolean | null> {
   const address = configuredRiteAddress()
-  if (!address || !process.env.RITUAL_RPC_URL) return null
+  if (!address) return null
   const client = createPublicClient({ chain: ritual, transport: http(configuredRpcUrl()) })
   return client.readContract({
     address,
@@ -37,23 +29,4 @@ export async function verifyStepOnchain(workflow: Workflow, step: TrailStep): Pr
     functionName: 'verifyStep',
     args: [workflow.id, step.hash, step.proof]
   })
-}
-
-export async function submitWorkflowOnchain(workflow: Workflow) {
-  const address = configuredRiteAddress()
-  const privateKey = configuredPrivateKey()
-  if (!address) throw new Error('Set RITE_ADDRESS or NEXT_PUBLIC_RITE_ADDRESS before sealing.')
-  if (!privateKey) throw new Error('Set PRIVATE_KEY before server-side sealing.')
-
-  const account = privateKeyToAccount(privateKey)
-  const publicClient = createPublicClient({ chain: ritual, transport: http(configuredRpcUrl()) })
-  const walletClient = createWalletClient({ account, chain: ritual, transport: http(configuredRpcUrl()) })
-  const txHash = await walletClient.writeContract({
-    address,
-    abi: riteAbi,
-    functionName: 'submitWorkflow',
-    args: [workflow.id, hashText(workflow.source), workflow.merkleRoot, workflow.reportHash, workflow.policyHash, '']
-  })
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash })
-  return { txHash, blockNumber: receipt.blockNumber.toString(), status: receipt.status }
 }

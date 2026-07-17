@@ -13,14 +13,14 @@ export function CreateWorkflowForm() {
     const response = await fetch('/api/workflows', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(Object.fromEntries(form)) })
     const data = await response.json() as { workflow?: { id: string }; error?: string }
     setPending(false)
-    if (!response.ok || !data.workflow) { setError(data.error ?? 'Could not create the workflow.'); return }
+    if (!response.ok || !data.workflow) { setError(data.error ?? 'Could not create the record.'); return }
     router.push(`/workflow/${data.workflow.id}`)
   }
   return <form onSubmit={submit}>
     <label className="field">Target<input required name="target" maxLength={120} placeholder="Vault.sol or 0x…" /></label>
-    <label className="field">Audit brief<textarea required name="brief" minLength={12} maxLength={2000} placeholder="What must this rite establish?" /></label>
+    <label className="field">Audit brief<textarea required name="brief" minLength={12} maxLength={2000} placeholder="What should this record establish?" /></label>
     <label className="field">Solidity or evidence<textarea required name="source" minLength={8} maxLength={24000} placeholder="Paste the relevant contract fragment or execution evidence." /></label>
-    <button className="button" disabled={pending}>{pending ? 'Witnessing…' : 'Perform rite →'}</button>
+    <button className="button" disabled={pending}>{pending ? 'Computing…' : 'Generate record →'}</button>
     {error && <p className="error">{error}</p>}
   </form>
 }

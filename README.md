@@ -1,8 +1,10 @@
 # Rite
 
-Every workflow is a rite: performed in order, witnessed, sealed. Break the order and the rite is void, no proof can exist.
+Rite records ordered contract-review work as Merkle commitments on Ritual Chain.
 
-Rite creates a deterministic three-step agent trail, produces an OpenZeppelin-compatible sorted-pair Merkle root, and exposes it through a dark technical dashboard and REST API. The UI can verify a leaf locally and, when a Rite contract address is configured, call `verifyStep` directly on Ritual testnet.
+The system produces a deterministic three-step trail, creates an OpenZeppelin-compatible sorted-pair Merkle root, and lets the user commit that root with their own wallet. A verifier can later check any step locally and against the onchain root.
+
+![Rite workflow schematic](public/rite-schematic.svg)
 
 ## Run locally
 
@@ -12,7 +14,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open `http://localhost:3000`, paste a Solidity fragment and create a workflow. Local development writes to `data/workflows.json` unless Upstash Redis env vars are present.
+Open `http://localhost:3000`, paste a Solidity fragment and create an audit record. Local development writes to `data/workflows.json` unless Upstash Redis env vars are present.
 
 ## Contract configuration
 
@@ -24,10 +26,9 @@ NEXT_PUBLIC_RITE_ADDRESS=0xYourRiteContract
 NEXT_PUBLIC_RITUAL_RPC_URL=https://rpc.ritualfoundation.org
 RITUAL_RPC_URL=https://rpc.ritualfoundation.org
 RITE_ADDRESS=0xYourRiteContract
-PRIVATE_KEY=0xServerSealWallet
 ```
 
-The browser never receives `PRIVATE_KEY`. The server-side seal route signs `submitWorkflow` with `PRIVATE_KEY`, while onchain verification remains read-only.
+`submitWorkflow` is signed by the connected browser wallet. The production application does not operate a server signer.
 
 ## Vercel storage
 
@@ -45,7 +46,6 @@ KV_REST_API_TOKEN=
 | `GET` | `/api/workflows` | List workflow receipts |
 | `POST` | `/api/workflows` | Create a deterministic audit trail |
 | `GET` | `/api/workflows/:id` | Read a receipt with proofs |
-| `POST` | `/api/workflows/:id/seal` | Submit the workflow root to Rite using `PRIVATE_KEY` |
 | `POST` | `/api/workflows/:id/verify-step` | Verify a step locally and optionally on Ritual |
 
 ## Deployment

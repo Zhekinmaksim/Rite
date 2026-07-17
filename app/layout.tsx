@@ -4,7 +4,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Rite',
-  description: 'Multi-agent audit workflows as verifiable onchain receipts on Ritual Chain.'
+  description: 'Ordered audit records committed to Ritual Chain as verifiable Merkle roots.'
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -16,14 +16,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <nav className="top-links" aria-label="Project links">
             <a href="https://github.com/Zhekinmaksim/Rite" target="_blank" rel="noreferrer">GitHub</a>
             <a href="https://x.com/0maxxdev" target="_blank" rel="noreferrer">X / 0maxxdev</a>
-            <span className="chain">rite ledger · Ritual Chain 1979</span>
+            <span className="chain">Ritual Chain · 1979</span>
           </nav>
         </div>
       </header>
       <main className="shell page-shell">{children}</main>
       <footer className="site-footer">
         <div className="shell footer-copy">
-          <span>performed in order · witnessed · sealed · break the order and the rite is void</span>
+          <span>ordered evidence · wallet signed · Merkle committed</span>
           <span className="footer-links">
             <a href="https://github.com/Zhekinmaksim/Rite" target="_blank" rel="noreferrer">GitHub</a>
             <a href="https://x.com/0maxxdev" target="_blank" rel="noreferrer">@0maxxdev</a>

@@ -44,7 +44,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           target: inferTarget(trimmed),
-          brief: 'Run a three-agent audit and produce a verifiable Rite receipt.',
+          brief: 'Produce an ordered audit record with a verifiable Merkle commitment.',
           source: trimmed
         })
       })
@@ -58,15 +58,27 @@ export default function Home() {
   }
 
   return <div className="page-stack">
-    <section className="hero">
-      <h1>Every workflow is a rite.</h1>
-      <p>Three agents audit your Solidity contract: a researcher finds issues, a critic challenges them, a finalizer signs the verdict. Each step is hashed and chained; the whole trail is anchored by a Merkle root you can commit to Ritual Chain and verify step by step.</p>
+    <section className="hero-grid">
+      <div className="hero">
+        <p className="eyebrow">Ritual Chain · scheme step.v1</p>
+        <h1>Ordered audit records, committed onchain.</h1>
+        <p>Rite turns a contract review into a deterministic evidence trail: researcher, critic, finalizer. Each step commits to its input, output and predecessor. The resulting Merkle root is signed by the user wallet and anchored on Ritual Chain.</p>
+      </div>
+      <div className="protocol-card" aria-label="Rite protocol summary">
+        <span>task hash</span>
+        <strong>researcher → critic → finalizer</strong>
+        <span>step hashes → Merkle root → wallet commit</span>
+      </div>
+    </section>
+
+    <section className="schematic-panel" aria-label="Rite workflow schematic">
+      <img src="/rite-schematic.svg" alt="Rite workflow schematic showing ordered audit steps, Merkle root and proof verification" />
     </section>
 
     <section className="receipt">
       <div className="section-head">
-        <h2>Submit a contract for audit</h2>
-        <span>researcher - critic - finalizer</span>
+        <h2>Create audit record</h2>
+        <span>researcher / critic / finalizer</span>
       </div>
       <textarea
         value={source}
@@ -77,14 +89,14 @@ export default function Home() {
       />
       {error && <p className="error">{error}</p>}
       <button className="primary-button" onClick={runAudit} disabled={running || source.trim().length === 0}>
-        {running ? 'Running agents...' : 'Run 3-agent audit'}
+        {running ? 'Computing trail...' : 'Generate record'}
       </button>
     </section>
 
     <section>
-      <h2 className="section-title">Workflows</h2>
+      <h2 className="section-title">Records</h2>
       {workflows.length === 0 ? (
-        <p className="muted mono">No workflows yet. Run your first audit above.</p>
+        <p className="muted mono">No records yet. Generate the first audit record above.</p>
       ) : (
         <ul className="workflow-list">
           {workflows.map(workflow => (

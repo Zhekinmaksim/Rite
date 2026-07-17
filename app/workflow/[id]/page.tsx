@@ -11,7 +11,7 @@ export default async function WorkflowPage({ params }: { params: Promise<{ id: s
   return <div className="page-stack">
     <section className="workflow-header">
       <div className="min-zero">
-        <h1>Rite record</h1>
+        <h1>Audit record</h1>
         <p className="mono muted break-anywhere">{workflow.id}</p>
       </div>
       <span className="stamp">local</span>
@@ -26,7 +26,7 @@ export default async function WorkflowPage({ params }: { params: Promise<{ id: s
     </section>
 
     <section>
-      <h2 className="section-title">Agent trail · {workflow.steps.length} steps</h2>
+      <h2 className="section-title">Evidence trail · {workflow.steps.length} steps</h2>
       <ol className="step-list">
         {workflow.steps.map(step => (
           <li key={step.hash} className="receipt step-card">
@@ -48,8 +48,8 @@ export default async function WorkflowPage({ params }: { params: Promise<{ id: s
     </section>
 
     <section className="receipt">
-      <h2>Anchor onchain</h2>
-      <p className="muted">Commits workflowId, Merkle root, report hash and policy hash to Rite on Ritual Chain. After this, any step can be proven against the onchain root.</p>
+      <h2>Commit onchain</h2>
+      <p className="muted">Signs submitWorkflow from the connected wallet and commits workflowId, task hash, Merkle root, report hash and policy hash to Rite on Ritual Chain. No server signer is used.</p>
       <WorkflowActions workflow={workflow} />
     </section>
   </div>
